@@ -1,0 +1,162 @@
+Turbo Assembler	 Version 4.1	    09/09/20 15:14:01	    Page 1
+ptchprg.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     .186
+      4				     ;-------------------------------------------
+      5	      =000D		     CR		     equ 13
+      6	      =000A		     LF		     equ 10
+      7				     ;-------------------------------------------
+      8				     org 100h
+      9				     ;-------------------------------------------
+     10				     .exitprog macro
+     11
+     12						     mov ax, 4c00h
+     13						     int 21h
+     14
+     15						     endm
+     16				     ;-------------------------------------------
+     17				     .write_str	     macro ptr
+     18
+     19						     mov ah, 09h
+     20						     mov dx, offset ptr
+     21						     int 21h
+     22
+     23						     endm
+     24				     ;-------------------------------------------
+     25	0100			     start:	     .write_str	greeting
+1    26
+1    27	0100  B4 09				     mov ah, 09h
+1    28	0102  BA 0000r				     mov dx, offset greeting
+1    29	0105  CD 21				     int 21h
+1    30
+     31
+     32	0107  33 C9				     xor cx, cx
+     33	0109  33 D2				     xor dx, dx
+     34	010B  BB 0011r				     mov bx, offset password
+     35
+     36	010E  B4 01		     input:	     mov ah, 01h
+     37	0110  CD 21				     int 21h
+     38
+     39
+     40
+     41	0112  3C 0D				     cmp al, CR
+     42	0114  74 0E				     je	lenanalys
+     43
+     44	0116  41				     inc cx
+     45	0117  83 F9 08 90			     cmp cx, paslength
+     46	011B  77 F1				     ja	input
+     47
+     48	011D  3A 07				     cmp al, [bx]
+     49	011F  75 1A				     jne wrongpas
+     50	0121  43		     continue:	     inc bx
+     51	0122  EB EA				     jmp input
+     52
+     53
+     54
+     55	0124  83 F9 08 90	     lenanalys:	     cmp cx, paslength
+     56	0128  75 14				     jne noacs
+     57
+Turbo Assembler	 Version 4.1	    09/09/20 15:14:01	    Page 2
+ptchprg.asm
+
+
+
+     58	012A  83 FA 00				     cmp dx, 0
+     59	012D  77 0F				     ja	noacs
+     60
+     61						     .write_str	access
+1    62
+1    63	012F  B4 09				     mov ah, 09h
+1    64	0131  BA 0019r				     mov dx, offset access
+1    65	0134  CD 21				     int 21h
+1    66
+     67						     .exitprog
+1    68
+1    69	0136  B8 4C00				     mov ax, 4c00h
+1    70	0139  CD 21				     int 21h
+1    71
+     72
+     73	013B  42		     wrongpas:	     inc dx
+     74	013C  EB E3				     jmp continue
+     75
+     76	013E			     noacs:	     .write_str	ban
+1    77
+1    78	013E  B4 09				     mov ah, 09h
+1    79	0140  BA 002Ar				     mov dx, offset ban
+1    80	0143  CD 21				     int 21h
+1    81
+     82						     .exitprog
+1    83
+1    84	0145  B8 4C00				     mov ax, 4c00h
+1    85	0148  CD 21				     int 21h
+1    86
+     87				     ;-------------------------------------------
+     88	014A			     .data
+     89
+     90	0000  49 6E 70 75 74 20	50+  greeting	     db	'Input Password', 0dh, 0ah, '$'
+     91	      61 73 73 77 6F 72	64+
+     92	      0D 0A 24
+     93	0011  62 6C 61 63 6B 6F	75+  password	     db	'blackout'
+     94	      74
+     95	      =0008		     paslength	     equ $ - password
+     96	0019  0D 0A 41 63 63 65	73+  access	     db	0dh, 0ah, 'Access allowed$'
+     97	      73 20 61 6C 6C 6F	77+
+     98	      65 64 24
+     99	002A  0D 0A 77 72 6F 6E	67+  ban	     db	0dh, 0ah, 'wrong attempt$'
+    100	      20 61 74 74 65 6D	70+
+    101	      74 24
+    102
+    103				     end start
+Turbo Assembler	 Version 4.1	    09/09/20 15:14:01	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/09/20"
+??FILENAME			  Text	 "ptchprg "
+??TIME				  Text	 "15:14:01"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _DATA
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 PTCHPRG
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ACCESS				  Byte	 DGROUP:0019
+BAN				  Byte	 DGROUP:002A
+CONTINUE			  Near	 DGROUP:0121
+CR				  Number 000D
+GREETING			  Byte	 DGROUP:0000
+INPUT				  Near	 DGROUP:010E
+LENANALYS			  Near	 DGROUP:0124
+LF				  Number 000A
+NOACS				  Near	 DGROUP:013E
+PASLENGTH			  Number 0008
+PASSWORD			  Byte	 DGROUP:0011
+START				  Near	 DGROUP:0100
+WRONGPAS			  Near	 DGROUP:013B
+
+Macro Name
+
+.EXITPROG
+.WRITE_STR
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  003A Word	  Public  DATA
+  _TEXT				  16  014A Word	  Public  CODE
+

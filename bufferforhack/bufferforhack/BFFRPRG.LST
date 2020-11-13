@@ -1,0 +1,172 @@
+Turbo Assembler	 Version 4.1	    09/09/20 17:44:18	    Page 1
+bffrprg.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     .186
+      4				     ;-------------------------------------------
+      5	      =000D		     CR		     equ 13
+      6	      =000A		     LF		     equ 10
+      7	      =0010		     buff_size	     equ 16
+      8				     ;-------------------------------------------
+      9				     org 100h
+     10				     ;-------------------------------------------
+     11				     ;ends program
+     12				     ;expects:	     no
+     13				     ;-------------------------------------------
+     14				     .exitprog macro
+     15
+     16						     mov ax, 4c00h
+     17						     int 21h
+     18
+     19						     endm
+     20				     ;-------------------------------------------
+     21				     ;writes string
+     22				     ;expects:	     addres of string
+     23				     ;-------------------------------------------
+     24				     .write_str	     macro ptr
+     25
+     26						     mov ah, 09h
+     27						     mov dx, offset ptr
+     28						     int 21h
+     29
+     30						     endm
+     31				     ;-------------------------------------------
+     32	0100			     start:	     .write_str	greeting
+1    33
+1    34	0100  B4 09				     mov ah, 09h
+1    35	0102  BA 0000r				     mov dx, offset greeting
+1    36	0105  CD 21				     int 21h
+1    37
+     38
+     39	0107  BB 003Ar				     mov bx, offset buffer
+     40
+     41	010A  B4 01		     input:	     mov ah, 01h
+     42	010C  CD 21				     int 21h
+     43
+     44	010E  3C 0D				     cmp al, CR	     ;checks for enter
+     45	0110  74 05				     je	next
+     46
+     47	0112  88 07				     mov ds:[bx], al ;writing in buffer
+     48	0114  43				     inc bx
+     49	0115  EB F3				     jmp input
+     50
+     51	0117  E8 0005		     next:	     call check
+     52						     .exitprog
+1    53
+1    54	011A  B8 4C00				     mov ax, 4c00h
+1    55	011D  CD 21				     int 21h
+1    56
+     57				     ;-------------------------------------------
+Turbo Assembler	 Version 4.1	    09/09/20 17:44:18	    Page 2
+bffrprg.asm
+
+
+
+     58				     ;compare with password and	prints result
+     59				     ;expects: none
+     60				     ;destory: bx, es, di, si, cx
+     61				     ;returns: none
+     62				     ;-------------------------------------------
+     63	011F			     check	     proc
+     64
+     65	011F  8C C3				     mov bx, es
+     66	0121  8E DB				     mov ds, bx
+     67	0123  B9 0008 90			     mov cx, paslength
+     68	0127  BF 003Ar				     mov di, offset buffer
+     69	012A  BE 0011r				     mov si, offset password
+     70	012D  E9 004Ar				     jmp cmpr
+     71
+     72	0130  74 0A		     ??continue:     je	??success
+     73						     .write_str	ban
+1    74
+1    75	0132  B4 09				     mov ah, 09h
+1    76	0134  BA 002Ar				     mov dx, offset ban
+1    77	0137  CD 21				     int 21h
+1    78
+     79	0139  EB 08 90				     jmp ??return
+     80
+     81	013C			     ??success:	      .write_str access
+1    82
+1    83	013C  B4 09				     mov ah, 09h
+1    84	013E  BA 0019r				     mov dx, offset access
+1    85	0141  CD 21				     int 21h
+1    86
+     87
+     88	0143  C3		     ??return:	     ret
+     89	0144					     endp
+     90				     ;-------------------------------------------
+     91	0144			     .data
+     92
+     93	0000  49 6E 70 75 74 20	50+  greeting	     db	'Input Password', 0dh, 0ah, '$'
+     94	      61 73 73 77 6F 72	64+
+     95	      0D 0A 24
+     96	0011  62 6C 61 63 6B 6F	75+  password	     db	'blackout'
+     97	      74
+     98	      =0008		     paslength	     equ $ - password
+     99	0019  0D 0A 41 63 63 65	73+  access	     db	0dh, 0ah, 'Access allowed$'
+    100	      73 20 61 6C 6C 6F	77+
+    101	      65 64 24
+    102	002A  0D 0A 77 72 6F 6E	67+  ban	     db	0dh, 0ah, 'wrong attempt$'
+    103	      20 61 74 74 65 6D	70+
+    104	      74 24
+    105	003A  10*(00)		     buffer:	     db	16 dup (00h)
+    106	004A  F3> A6		     cmpr:	     rep cmpsb
+    107	004C  E9 0130r				     jmp ??continue
+    108
+    109				     end start
+Turbo Assembler	 Version 4.1	    09/09/20 17:44:18	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??CONTINUE			  Near	 DGROUP:0130
+??DATE				  Text	 "09/09/20"
+??FILENAME			  Text	 "bffrprg "
+??RETURN			  Near	 DGROUP:0143
+??SUCCESS			  Near	 DGROUP:013C
+??TIME				  Text	 "17:44:18"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0103H
+@CURSEG				  Text	 _DATA
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 BFFRPRG
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ACCESS				  Byte	 DGROUP:0019
+BAN				  Byte	 DGROUP:002A
+BUFFER				  Near	 DGROUP:003A
+BUFF_SIZE			  Number 0010
+CHECK				  Near	 DGROUP:011F
+CMPR				  Near	 DGROUP:004A
+CR				  Number 000D
+GREETING			  Byte	 DGROUP:0000
+INPUT				  Near	 DGROUP:010A
+LF				  Number 000A
+NEXT				  Near	 DGROUP:0117
+PASLENGTH			  Number 0008
+PASSWORD			  Byte	 DGROUP:0011
+START				  Near	 DGROUP:0100
+
+Macro Name
+
+.EXITPROG
+.WRITE_STR
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  004F Word	  Public  DATA
+  _TEXT				  16  0144 Word	  Public  CODE
+
